@@ -16,4 +16,19 @@ services:
       dockerfile: _docker/app/Dockerfile
     volumes:
       - ./:/var/www/employess-app/
+    depends_on:
+      - db
     container_name: project_app
+
+  db:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: employess-db
+    ports:
+      - 8101:5432
+    container_name: project_db
