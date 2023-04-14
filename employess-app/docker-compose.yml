@@ -1,0 +1,19 @@
+services:
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./:/var/www/employess-app/
+      - ./_docker/nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - "8876:80"
+    depends_on:
+      - app
+    container_name: project_nginx
+
+  app:
+    build:
+      context: .
+      dockerfile: _docker/app/Dockerfile
+    volumes:
+      - ./:/var/www/employess-app/
+    container_name: project_app
