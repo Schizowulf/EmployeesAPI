@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Utils\EmployeeFields;
 
 return new class extends Migration
 {
@@ -11,9 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $maxStringLength = 30;
-        $maxPhoneLength = 12;
-        $maxUrlLength = 200;
+        $restriction = EmployeeFields::getRestriction();
+        $maxStringLength = $restriction['maxStringLength'];
+        $maxPhoneLength = $restriction['phoneLength'];
+        $maxUrlLength = $restriction['maxUrlLength'];
 
         Schema::create('employees', function (Blueprint $table) use ($maxStringLength, $maxPhoneLength, $maxUrlLength) {
             $table->id();
