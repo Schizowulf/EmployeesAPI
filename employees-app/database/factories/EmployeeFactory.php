@@ -27,7 +27,7 @@ class EmployeeFactory extends Factory
             "name"          => $randName,
             "patronymic"    => $randPatronymic,
             "surname"       => $randSurname,
-            "birthday"      => $this->faker->date('m.d.Y', strtotime("31 December 2000")),
+            "birthday"      => $this->faker->date('Y-m-d', strtotime("31 December 2000")),
             "position"      => $randPosition,
             "phone"         => '+' . random_int(71111111111, 79999999999),
             "avatar_url"    => $this->faker->imageUrl()
