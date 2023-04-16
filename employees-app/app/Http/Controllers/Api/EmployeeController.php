@@ -3,22 +3,32 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EmployeeCollection;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
 use App\Utils\EmployeeFields;
 use App\Utils\ValidateRequest;
+use App\Utils\EmployeeFilters;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
     /**
      * Display a listing of the employees.
      */
-    public function index()
+    public function index(Request $request, EmployeeFilters $filter, ValidateRequest $validator)
     {
-        return EmployeeResource::collection(Employee::all());
+
+        $validateResult = $validator->validateRequest($request, EmployeeFields::getFiltersRules());
+
+        if ($validateResult !== true) 
+        {
+            return $validateResult;
+        } 
+
+        return EmployeeResource::collection($filter->filterRequest($request));
     }
 
     /**
@@ -26,7 +36,7 @@ class EmployeeController extends Controller
      */
     public function store(Request $request, ValidateRequest $validator)
     {
-        $validateResult = $validator->validateRequest($request, EmployeeFields::getRules());
+        $validateResult = $validator->validateRequest($request, EmployeeFields::getDbRules());
 
         if ($validateResult !== true) 
         {
@@ -35,7 +45,7 @@ class EmployeeController extends Controller
 
         $newEmployeeEntity = Employee::create($request->all());
 
-        return $this->singleEmployeeToResponseForm($newEmployeeEntity);
+        return new EmployeeResource($newEmployeeEntity);
     }
 
     /**
@@ -47,7 +57,7 @@ class EmployeeController extends Controller
 
         if(!is_null($employeeEntity))
         {
-            return $this->singleEmployeeToResponseForm($employeeEntity);
+            return new EmployeeResource($employeeEntity);
         }
 
         return $this->employeeNotFoundResponse();
@@ -58,7 +68,7 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, string $id, ValidateRequest $validator)
     {
-        $validateResult = $validator->validateRequest($request, EmployeeFields::getRules());
+        $validateResult = $validator->validateRequest($request, EmployeeFields::getDbRules());
 
         if ($validateResult !== true) 
         {
@@ -74,21 +84,9 @@ class EmployeeController extends Controller
 
         $employeeEntity->update($request->all());
 
-        return $this->singleEmployeeToResponseForm($employeeEntity);
+        return new EmployeeResource($employeeEntity);;
     }
 
-    /**
-     * Remove the specified employee from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
-
-    private function singleEmployeeToResponseForm(Employee $entity, $meta = null) : JsonResponse
-    {
-        return response()->json(["data" => [$entity->attributesToArray()], "meta" => $meta]);
-    }
 
     private function employeeNotFoundResponse() : JsonResponse
     {
