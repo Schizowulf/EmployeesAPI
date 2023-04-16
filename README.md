@@ -4,6 +4,7 @@
 
 ## Installation
 ```
+cd .\employees-app\
 docker compose up -d
 ```
 
