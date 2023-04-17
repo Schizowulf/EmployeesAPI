@@ -41,9 +41,10 @@ class EmployeeController extends Controller
         if ($validateResult !== true) 
         {
             return $validateResult;
-        } 
+        }
 
-        $newEmployeeEntity = Employee::create($request->all());
+        $newFields = $this->convertDate($request->all());
+        $newEmployeeEntity = Employee::create($newFields);
 
         return new EmployeeResource($newEmployeeEntity);
     }
@@ -53,6 +54,11 @@ class EmployeeController extends Controller
      */
     public function show(string $id)
     {
+        if(!is_numeric($id)) 
+        {
+            return $this->employeeNotFoundResponse();
+        }      
+
         $employeeEntity = Employee::find($id);
 
         if(!is_null($employeeEntity))
@@ -82,7 +88,8 @@ class EmployeeController extends Controller
             return $this->employeeNotFoundResponse();
         }
 
-        $employeeEntity->update($request->all());
+        $newFields = $this->convertDate($request->all());
+        $employeeEntity->update($newFields);
 
         return new EmployeeResource($employeeEntity);;
     }
@@ -92,5 +99,11 @@ class EmployeeController extends Controller
     {
         $notFoundCode = 404;
         return response()->json(['message' => 'Employee not found!', "errors" => []], $notFoundCode);
+    }
+
+    private function convertDate($fields)
+    {
+        $fields['birthday'] = date("Y-m-d", strtotime($fields['birthday']));
+        return $fields;
     }
 }
