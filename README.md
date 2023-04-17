@@ -6,7 +6,13 @@
 ```
 cd .\employees-app\
 docker compose up -d
+docker exec -it project_app bash
+```
+Следующую команду выполнить в терминале контейнера:
+```
+php artisan migrate --seed
 ```
 
 ## Documentation
-Comming soon!
+
+https://app.swaggerhub.com/apis/DmitryPeKo/open-api_employee_api/0.0.1
